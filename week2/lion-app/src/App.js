@@ -35,29 +35,42 @@ class WorldClock extends React.Component {
   }
 }
 
-function App() {
-  const cityTimeData = [
-    ['서울', 10],
-    ['베이징', 9],
-    ['시드니', 12],
-    ['LA', 17],
-    ['부산', 10]
-  ]
+class App extends React.Component {
 
-  const WorldClockList = cityTimeData.map((citytime, index)=>
-      <WorldClock city={citytime[0]} time={citytime[1]}/>
-  )
+  constructor(props) {
+    super(props)
+    this.cityTimeData = [
+      ['서울', 10],
+      ['베이징', 9],
+      ['시드니', 12],
+      ['LA', 17],
+      ['부산', 10]
+    ]
+    this.state = {
+      content: ''
+    }
+  }
 
-  return (
-    <div className="App">
-      <h1 className="myStyle">안녕하세요</h1>
-      <div className={'post'}>
-        첫 게시글 입니다.
+  handlingChange = (event) => {
+    this.setState({content: event.target.value})
+  }
+
+  render(){
+    return (
+      <div className="App">
+        <h1 className="myStyle">안녕하세요</h1>
+        <div className={'post'}>
+          첫 게시글 입니다.
+          <textarea value={this.state.content} onChange={this.handlingChange}></textarea>
+        </div>
+        {this.cityTimeData.map((citytime, index)=>
+          <WorldClock city={citytime[0]} time={citytime[1]}/>
+      )}
       </div>
-      {WorldClockList}
-    </div>
-
-  );
+  
+    );
+  }
+  
 }
 
 export default App;
