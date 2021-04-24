@@ -2,6 +2,15 @@ import React from 'react';
 import api from './api';
 import './App.css';
 import PostView from './Components/PostView'
+import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+
 
 class App extends React.Component {
 
@@ -18,6 +27,8 @@ class App extends React.Component {
     this.getPosts()
   }
 
+  
+
   async getPosts() {
     const _results = await api.getAllPosts()
     console.log(_results)
@@ -32,38 +43,66 @@ class App extends React.Component {
   handlingSubmit = async (event) => {
     event.preventDefault()
     let result = await api.createPost({title:this.state.title, content:this.state.content})
-    console.log("완료됨!", result.data)
+    this.setState({title:'', content:''})
+    this.getPosts()
+  }
+
+  handlingDelete= async (id) => {
+    await api.deletePost(id)
+    this.getPosts()
   }
 
   render(){
     return (
       <div className="App">
+        <Container maxWidth="lg">
         <div className="PostingSection">
+        <Paper className="PostingPaper">
           <h2>대나무 숲 글 작성하기</h2>
-          <form onSubmit={this.handlingSubmit}>
-          <input 
-            name="title"
-            value={this.state.title}
-            onChange={this.handlingChange}
-          />
-          <textarea 
-            name = "content"
-            value = {this.state.content}
-            onChange = {this.handlingChange}
-          />
-            <button type="submit">제출하기</button>
+          <form className="PostingForm" onSubmit={this.handlingSubmit}>
+           <TextField
+          id="outlined-textarea"
+          label="Title"
+          name="title"
+          value={this.state.title}
+          onChange={this.handlingChange}
+          variant="outlined"
+        />
+          <TextField
+          id="outlined-multiline-static"
+          label="Content"
+          multiline
+          rows={4}
+          name = "content"
+          variant="outlined"
+          value={this.state.content}
+          onChange={this.handlingChange}
+        />
+        <Button type="submit" variant="outlined">제출하기</Button>
           </form>
+          </Paper>
         </div>
         <div className="ViewSection">
           {
             this.state.results.map((post)=>
-              <PostView title={post.title} content={post.content} />
+            <Card className="card" variant="outlined">
+            <CardContent>
+              <Typography className="card-title" color="textSecondary" gutterBottom>
+              <PostView key={post.id} id={post.id} title={post.title} content={post.content} />
+              </Typography>
+              <Typography variant="h5" component="h2">
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button color="secondary" value={post.id} onClick={ (e) => {this.handlingDelete(post.id)} } size="small">삭제하기</Button>
+            </CardActions>
+          </Card>
             )
           }
           
   
         </div>
-        
+        </Container>
       </div>
     );
   }
