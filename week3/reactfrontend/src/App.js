@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import api from './api';
 import './App.css';
 import PostView from './Components/PostView'
@@ -12,60 +12,50 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
 
-class App extends React.Component {
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      title: '',
-      content: '',
-      results: [],
-    }
-  }
-
-  componentDidMount() {
-    this.getPosts()
-  }
-
+export default () =>  {
   
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [result, setResult] = useState([]);
 
-  async getPosts() {
-    const _results = await api.getAllPosts()
-    console.log(_results)
-    this.setState({results: _results.data})
+  useEffect(() => {
+    getPosts()
+  }, [])
+
+  const getPosts = async () => {
+   const _results = await api.getAllPosts()
+   console.log(_results)
+   setResult(_results.data)
   }
 
-
-  handlingChange = (event) => {
-    this.setState({[event.target.name]: event.target.value})
-  }
-
-  handlingSubmit = async (event) => {
+  const handlingSubmit = async (event) => {
     event.preventDefault()
-    let result = await api.createPost({title:this.state.title, content:this.state.content})
-    this.setState({title:'', content:''})
-    this.getPosts()
+    let result = await api.createPost({title:title, content:content})
+    setTitle('')
+    setContent('')
+    getPosts()
   }
 
-  handlingDelete= async (id) => {
+  const handlingDelete = async (id) => {
     await api.deletePost(id)
-    this.getPosts()
+    getPosts()
   }
 
-  render(){
     return (
       <div className="App">
         <Container maxWidth="lg">
         <div className="PostingSection">
         <Paper className="PostingPaper">
           <h2>대나무 숲 글 작성하기</h2>
-          <form className="PostingForm" onSubmit={this.handlingSubmit}>
+          <form className="PostingForm" onSubmit={handlingSubmit}>
            <TextField
           id="outlined-textarea"
           label="Title"
           name="title"
-          value={this.state.title}
-          onChange={this.handlingChange}
+          value={title}
+          onChange={(event) => {
+            setTitle(event.target.value)
+          }}
           variant="outlined"
         />
           <TextField
@@ -75,8 +65,10 @@ class App extends React.Component {
           rows={4}
           name = "content"
           variant="outlined"
-          value={this.state.content}
-          onChange={this.handlingChange}
+          value={content}
+          onChange={(event) => {
+            setContent(event.target.value)
+          }}
         />
         <Button type="submit" variant="outlined">제출하기</Button>
           </form>
@@ -84,7 +76,7 @@ class App extends React.Component {
         </div>
         <div className="ViewSection">
           {
-            this.state.results.map((post)=>
+            result.map((post)=>
             <Card className="card" variant="outlined">
             <CardContent>
               <Typography className="card-title" color="textSecondary" gutterBottom>
@@ -94,7 +86,7 @@ class App extends React.Component {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button color="secondary" value={post.id} onClick={ (e) => {this.handlingDelete(post.id)} } size="small">삭제하기</Button>
+              <Button color="secondary" value={post.id} onClick={ (e) => {handlingDelete(post.id)} } size="small">삭제하기</Button>
             </CardActions>
           </Card>
             )
@@ -106,7 +98,3 @@ class App extends React.Component {
       </div>
     );
   }
-  
-}
-
-export default App;

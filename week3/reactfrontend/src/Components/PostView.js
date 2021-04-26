@@ -5,9 +5,9 @@ const dummy_prop = {
     content: '테스트용 글입니다.'
 }
 
-export default class PostView extends Component {
-    render() {
-        const {title, content, id} = this.props
+function PostView(props) {
+    
+        const {title, content, id} = props
         return (
             <div>
                 <h3>{id}</h3>
@@ -15,5 +15,7 @@ export default class PostView extends Component {
                 <p>{content}</p>
             </div>
         )
-    }
+    
 }
+
+export default PostView;
